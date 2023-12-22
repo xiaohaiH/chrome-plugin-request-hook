@@ -1,3 +1,7 @@
+// https://npm.onmicrosoft.cn   类似 https://unpkg.com/         举例 https://unpkg.com/vue@2.6.0/types/index.d.ts
+// https://jsd.onmicrosoft.cn   类似 https://www.jsdelivr.com/  举例 https://cdn.jsdelivr.net/npm/vue@2.6.0/types/index.d.ts
+// https://fastly.jsdelivr.net  类似 https://www.jsdelivr.com/  举例 https://cdn.jsdelivr.net/npm/vue@2.6.0/types/index.d.ts
+
 /** 匹配的正则及后续替换的内容 */
 const regArr: [RegExp, string | ((str: string, reg: RegExp) => string)][] = [
     [/cdn\.jsdelivr\.net\/npm/, 'fastly.jsdelivr.net/npm'],
