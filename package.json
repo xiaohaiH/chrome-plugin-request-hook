@@ -1,0 +1,12 @@
+{
+    "name": "code-hainan",
+    "version": "0.1.0",
+    "private": true,
+    "scripts": {
+        "start": "tsc -w"
+    },
+    "dependencies": {
+        "typescript": "~4.5.5"
+    },
+    "devDependencies": {}
+}

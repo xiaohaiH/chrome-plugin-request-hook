@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head>
+        <meta charset="UTF-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Document</title>
+        <script type="text/javascript" src="popup.js" async="defer"></script>
+        <style type="text/css">
+            .header {
+                position: relative;
+            }
+            #msg-content {
+                position: absolute;
+                top: 50%;
+                right: 10px;
+                transform: translate(0, -50%);
+            }
+        </style>
+    </head>
+    <body>
+        <div class="header">
+            <h3>替换指定请求</h3>
+            <div id="msg-content">123</div>
+        </div>
+        <div>
+            <button id="save">保存数据</button>
+            <button id="get">获取数据</button>
+            <button id="remove">删除数据</button>
+            <button id="clear">清空数据</button>
+        </div>
+        <div>
+            <div>
+                <div>同步的内容：</div>
+                <div id="content-box"></div>
+            </div>
+            <label>
+                <div>保存的键</div>
+                <input id="key" type="text" placeholder="保存的键" style="width: 80px" />
+            </label>
+            <label>
+                <div>保存的值</div>
+                <input id="value" type="textarea" placeholder="保存的值" style="width: 600px; height: 400px" />
+            </label>
+        </div>
+    </body>
+</html>
