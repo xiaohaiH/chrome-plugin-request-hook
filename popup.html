@@ -4,9 +4,54 @@
         <meta charset="UTF-8" />
         <meta http-equiv="X-UA-Compatible" content="IE=edge" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>Document</title>
-        <script type="text/javascript" src="popup.js" async="defer"></script>
+        <title>请求拦截</title>
         <style type="text/css">
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+            }
+            body {
+                width: 800px;
+                height: 600px;
+                padding: 8px 10px;
+                overflow: hidden;
+                display: flex;
+                flex-flow: column;
+            }
+            .flex-none {
+                flex: none;
+            }
+            .mr-4 {
+                margin-right: 4px;
+            }
+            .mb-4 {
+                margin-bottom: 4px;
+            }
+            .mt-4 {
+                margin-top: 4px;
+            }
+
+            input:not([type='checkbox']),
+            textarea {
+                width: 100%;
+                /* margin: 4px 0 8px; */
+            }
+            textarea {
+                min-height: 80px;
+                padding: 4px 8px;
+            }
+            button {
+                padding: 4px 14px;
+            }
+            button + button {
+                margin-left: 10px;
+            }
+            label {
+                margin-bottom: 4px;
+                display: block;
+            }
+
             .header {
                 position: relative;
             }
@@ -16,32 +61,62 @@
                 right: 10px;
                 transform: translate(0, -50%);
             }
+            .control-btn-box {
+                margin: 4px 0 8px;
+            }
+            .content {
+                overflow: auto;
+                flex: auto;
+                display: flex;
+                justify-content: space-between;
+            }
+            .content > :not(:first-child) {
+                margin-left: 10px;
+            }
+            .content > :first-child {
+                width: 180px;
+                border-radius: 2px;
+                padding: 6px 10px;
+                border: 1px solid #aaa;
+                color: #15141a;
+                overflow: auto;
+                flex: none;
+            }
+            .content > :last-child {
+                color: #15141a;
+                flex: auto;
+            }
+            details summary {
+                font-size: 16px;
+            }
+            .content > :first-child p {
+                cursor: pointer;
+                font-size: 14px;
+                margin: 2px 0;
+            }
+            details p {
+                margin-left: 20px !important;
+            }
+            .content > :first-child p:hover,
+            .content > :first-child .is-active {
+                color: #d16c00;
+            }
         </style>
     </head>
     <body>
         <div class="header">
-            <h3>替换指定请求</h3>
-            <div id="msg-content">123</div>
+            <h3>请求拦截</h3>
+            <div id="msg-content"></div>
         </div>
-        <div>
-            <button id="save">保存数据</button>
-            <button id="get">获取数据</button>
-            <button id="remove">删除数据</button>
-            <button id="clear">清空数据</button>
+        <div class="control-btn-box">
+            <button id="add-btn">新增数据</button>
+            <button id="sync-btn">同步数据</button>
+            <button id="clear-btn">清空数据</button>
         </div>
-        <div>
-            <div>
-                <div>同步的内容：</div>
-                <div id="content-box"></div>
-            </div>
-            <label>
-                <div>保存的键</div>
-                <input id="key" type="text" placeholder="保存的键" style="width: 80px" />
-            </label>
-            <label>
-                <div>保存的值</div>
-                <input id="value" type="textarea" placeholder="保存的值" style="width: 600px; height: 400px" />
-            </label>
-        </div>
+        <div class="content"></div>
+
+        <script type="text/javascript" src="fake_env.js"></script>
+        <script type="text/javascript" src="chrome_assist.js"></script>
+        <script type="text/javascript" src="popup.js"></script>
     </body>
 </html>
