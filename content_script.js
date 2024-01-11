@@ -291,35 +291,11 @@ function core() {
                     },
                 },
             };
-            window.XMLHttpRequest = class fd extends rawXMLHttpRequest {
+            class XMLHttpRequest extends rawXMLHttpRequest {
                 /** 待执行的插件 - 插件只执行一次, 防止多次执行 */
                 plugins = [];
                 /** 执行的插件备份 */
                 pluginsBackup = [];
-                _onreadystatechange;
-                get onreadystatechange() {
-                    return this._onreadystatechange;
-                }
-                set onreadystatechange(v) {
-                    this._onreadystatechange = v;
-                    this.listenerXhrEnd('onreadystatechange');
-                }
-                _onload;
-                get onload() {
-                    return this._onload;
-                }
-                set onload(v) {
-                    this._onload = v;
-                    this.listenerXhrEnd('onload');
-                }
-                _onloadend;
-                get onloadend() {
-                    return this._onloadend;
-                }
-                set onloadend(v) {
-                    this._onloadend = v;
-                    this.listenerXhrEnd('onloadend');
-                }
                 stateMap = {};
                 /** 拦截属性上的事件 */
                 listenerXhrEnd(type) {
@@ -330,6 +306,7 @@ function core() {
                         if (this.readyState === 4) {
                             this.carryPlugins(() => super.removeEventListener('readystatechange', readystatechange));
                             // 非 onreadystatechange 仅在完成时执行即可
+                            // @ts-ignore
                             type !== 'onreadystatechange' && this[type]?.(ev);
                         }
                         // onreadystatechange 需要每次都执行
@@ -339,6 +316,31 @@ function core() {
                 }
                 constructor() {
                     super();
+                    // class 原型上的方法不能被枚举到
+                    // 将原型上的方法增加到实例上
+                    ['open', 'send', 'setRequestHeader', 'addEventListener'].forEach((k) => {
+                        Object.defineProperty(this, k, {
+                            configurable: true,
+                            enumerable: true,
+                            writable: true,
+                            // @ts-ignore
+                            value: this[k],
+                        });
+                    });
+                    let aabb = {};
+                    ['onload', 'onloadend', 'onreadstatechange'].forEach((k) => {
+                        Object.defineProperty(this, k, {
+                            configurable: true,
+                            enumerable: true,
+                            get() {
+                                return aabb[k];
+                            },
+                            set(val) {
+                                aabb[k] = val;
+                                this.listenerXhrEnd(k);
+                            },
+                        });
+                    });
                 }
                 cacheSetHeaders = {};
                 setRequestHeader(name, value) {
@@ -353,12 +355,23 @@ function core() {
                 open(method, _url, async, username, password) {
                     let url = _url.toString();
                     const { src, plugins } = that.replaceUrl(url);
+                    if (!plugins.length) {
+                        const params = [method, _url, async, username, password].filter((v) => typeof v !== 'undefined');
+                        return rawXMLHttpRequest.prototype.open.apply(this, params);
+                    }
                     this.plugins = plugins;
-                    // 先开启防止 xhr 报错
-                    super.open('GET', '');
+                    // 用来获取设置的参数 -- start
+                    const tempXhr = new rawXMLHttpRequest();
                     this.plugins.forEach((o) => {
-                        o.reqHandler?.(this);
+                        o.reqHandler?.(tempXhr);
                     });
+                    // @ts-ignore
+                    this.method = tempXhr.method;
+                    // @ts-ignore
+                    this.params = tempXhr.params;
+                    // // @ts-ignore
+                    // this.data = tempXhr.data;
+                    // 用来获取设置的参数 -- end
                     this.pluginsBackup = plugins.map((v) => ({ ...v }));
                     let str = '';
                     if (this.params) {
@@ -373,15 +386,15 @@ function core() {
                     // undefined 会认定为 false
                     // 可能导致一些奇怪的报错, 因此用 filter 过滤一遍
                     const params = [this.method || method, src + str, async, username, password].filter((v) => typeof v !== 'undefined');
-                    super.open.apply(this, params);
-                    // 由于 setRequestHeader 之类的方法必须在
-                    // open 执行后才会生效,
-                    // 因此 plugin[*].reqHandler 执行两次
+                    // @ts-ignore
+                    return rawXMLHttpRequest.prototype.open.apply(this, params);
+                    // super.open.apply(this, params);
+                }
+                send(body) {
+                    // 在传参前执行插件方法, 以便覆盖
                     this.plugins.forEach((o) => {
                         o.reqHandler?.(this);
                     });
-                }
-                send(body) {
                     if (!this.plugins.length)
                         return super.send(body);
                     // Content-Type                         提供的参数                           对应的规则
@@ -420,6 +433,7 @@ function core() {
                             (val, cb) => {
                                 if (!val)
                                     return;
+                                // @ts-ignore
                                 [...val].forEach(([k, v]) => cb(k, v));
                             },
                         ],
@@ -439,6 +453,7 @@ function core() {
                             (val, cb) => {
                                 if (!val)
                                     return;
+                                // @ts-ignore
                                 [...val].forEach(([k, v]) => cb(k, v));
                             },
                         ],
@@ -497,7 +512,8 @@ function core() {
                         }, v));
                     cb?.();
                 }
-            };
+            }
+            window.XMLHttpRequest = XMLHttpRequest;
             return this;
         },
         /** 合并数据 */
